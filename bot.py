@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import tomllib
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from pprint import pprint
@@ -89,6 +90,18 @@ def main() -> None:
     pprint(f"{cfg}")
 
     install_browser(cfg.browser)
+
+    with sync_playwright() as pw:
+        # Set up the browser
+        browser = getattr(pw, cfg.browser).launch(headless=False)
+        context = browser.new_context(locale="es-ES")
+        page = context.new_page()
+
+        # Open the starting page
+        page.goto(cfg.base_url)
+
+        time.sleep(50)
+        browser.close()
 
 if __name__ == "__main__":
     main()
