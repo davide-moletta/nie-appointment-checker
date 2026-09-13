@@ -1,4 +1,5 @@
 import subprocess
+import random
 import sys
 import tomllib
 import time
@@ -11,6 +12,20 @@ from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 BROWSERS = {"chromium", "firefox", "webkit"}
 DEFAULT_BROWSER = "firefox"
 NO_CITAS_TEXT = "En este momento no hay citas disponibles"
+
+# HTML elements
+MOTIVE_SELECTION = "select[id^='tramiteGrupo']"
+ACCEPT_BUTTON = "#btnAceptar"
+CONTINUE_BUTTON = "#btnEntrar"
+SEND_BUTTON = "#btnEnviar"
+RADIAL_NIE = "#rdbTipoDocNie"
+RADIAL_PASSPORT = "#rdbTipoDocPas"
+DOC_NUMBER_TEXT = "#txtIdCitado"
+FULL_NAME_TEXT = "#txtDesCitado"
+BIRTHYEAR_TEXT = "#txtAnnoCitado"
+NATIONALITY_SELECT = "#txtPaisNac"
+INFO_MSG_NO_APPOINTMENTS = ".mf-msg__info"
+RESULT_OFFICES  = "select[id^='idSede']"
 
 @dataclass
 class Config:
@@ -51,8 +66,8 @@ def load_config(path: str = "config.toml") -> Config:
         full_name = raw["FULL_NAME"].upper(),
         birth_year = int(raw["BIRTH_YEAR"]),
         country = raw["COUNTRY"],
-        min_wait = int(raw["MIN_WAIT"]),
-        max_wait = int(raw["MAX_WAIT"]),
+        min_wait = int(raw["MIN_WAIT"]) * 60, # Convert to seconds
+        max_wait = int(raw["MAX_WAIT"]) * 60, # Convert to seconds
         telegram_bot_token = raw.get("TELEGRAM_BOT_TOKEN", ""),
         telegram_chat_id = str(raw.get("TELEGRAM_CHAT_ID", "")),
         browser = str(raw.get("BROWSER", DEFAULT_BROWSER)).lower(),
@@ -85,6 +100,46 @@ def install_browser(browser: str) -> None:
     subprocess.run([sys.executable, "-m", "playwright", "install", browser], check=True)
     print(f"Browser '{browser}' installed")
 
+# Check if the appointment for the NIE is available
+def check_nie_appointment(page, cfg: Config) -> bool:
+    # Go to starting page
+    page.goto(cfg.base_url)
+    
+    # Page 1: Motive selection
+    page.select_option(MOTIVE_SELECTION, value=cfg.motive)
+    page.click(ACCEPT_BUTTON)
+
+    # Page 2: Info page
+    page.click(CONTINUE_BUTTON)
+
+    # Page 3: Personal data form
+    if cfg.doc_type == "nie":
+        page.check(RADIAL_NIE)
+    else:
+        page.check(RADIAL_PASSPORT)
+
+    page.fill(DOC_NUMBER_TEXT, cfg.doc_number)
+    page.fill(FULL_NAME_TEXT, cfg.full_name)
+    page.fill(BIRTHYEAR_TEXT, str(cfg.birth_year))
+    page.select_option(NATIONALITY_SELECT, label=cfg.country)
+    page.click(SEND_BUTTON)
+
+    # Page 4: Confirm
+    page.click(CONTINUE_BUTTON)
+
+    # Page 5: Result, info banner means no appointments, office picker means availability
+    page.wait_for_selector(
+        f"{INFO_MSG_NO_APPOINTMENTS}, {RESULT_OFFICES}",
+        state="visible",
+        timeout=15000,
+    )
+    banner = page.query_selector(INFO_MSG_NO_APPOINTMENTS)
+    if banner and NO_CITAS_TEXT in banner.inner_text():
+        return False
+    if page.query_selector(RESULT_OFFICES):
+        return True
+    raise RuntimeError("unexpected result page — layout changed?")
+
 def main() -> None:
     cfg = load_config()
     pprint(f"{cfg}")
@@ -97,10 +152,25 @@ def main() -> None:
         context = browser.new_context(locale="es-ES")
         page = context.new_page()
 
-        # Open the starting page
-        page.goto(cfg.base_url)
+        while True:
+            # Check if the appointment is available
+            try:
+                found = check_nie_appointment(page, cfg)
+            except Exception as e:
+                print(f"[!] flow error: {e}")
+                found = False
 
-        time.sleep(50)
+            # If there is an appointment print a note and stop
+            if found:
+                print("Appointment available, complete the process manually")
+                input("Pause, press Enter to restart the loop or Ctrl+C to exit")
+                break
+
+            # Wait until next request
+            wait = random.randint(cfg.min_wait, cfg.max_wait)
+            print(f"No available appointments, next check in {wait / 60} min")
+            time.sleep(wait)
+
         browser.close()
 
 if __name__ == "__main__":
