@@ -7,10 +7,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from pprint import pprint
 
-from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
+from playwright.sync_api import sync_playwright
 
-BROWSERS = {"chromium", "firefox", "webkit"}
-DEFAULT_BROWSER = "firefox"
+BROWSER_ENGINES = {"chromium", "firefox", "webkit"}
+DEFAULT_BROWSER = "chromium"
+LOCAL_BROWSERS = {"chrome", "msedge"}
+ALL_BROWSERS = BROWSER_ENGINES | LOCAL_BROWSERS
+
 NO_CITAS_TEXT = "En este momento no hay citas disponibles"
 
 # HTML elements
@@ -92,8 +95,8 @@ def load_config(path: str = "config.toml") -> Config:
     )
 
     # Sanitize input values
-    if cfg.browser not in BROWSERS:
-        raise ValueError(f"BROWSER must be one of {sorted(BROWSERS)}, got {cfg.browser!r}")
+    if cfg.browser not in ALL_BROWSERS:
+        raise ValueError(f"BROWSER must be one of {sorted(ALL_BROWSERS)}, got {cfg.browser!r}")
     if cfg.doc_type not in {"nie", "passport"}:
         raise ValueError(f"DOC_TYPE must be 'nie' or 'passport', got {cfg.doc_type!r}")
     if cfg.min_wait >= cfg.max_wait:
@@ -105,6 +108,9 @@ def load_config(path: str = "config.toml") -> Config:
 
 # Install the browser engine if it is not already installed
 def install_browser(browser: str) -> None:
+    if browser in LOCAL_BROWSERS:
+        return  # system-installed, nothing to download
+
     # Try to run the browser to see if the engine is present
     try:
         with sync_playwright() as pw:
@@ -117,6 +123,27 @@ def install_browser(browser: str) -> None:
     print(f"Browser '{browser}' not installed, downloading...")
     subprocess.run([sys.executable, "-m", "playwright", "install", browser], check=True)
     print(f"Browser '{browser}' installed")
+
+# Launch the configured browser
+def launch_browser(pw, name: str):
+    if name in LOCAL_BROWSERS:
+        return pw.chromium.launch(channel=name, headless=False)
+
+    launcher = getattr(pw, name)
+    if name == "chromium":
+        return launcher.launch(
+            headless=False,
+            args=["--disable-blink-features=AutomationControlled"],
+        )
+    if name == "firefox":
+        return launcher.launch(
+            headless=False,
+            firefox_user_prefs={
+                "dom.webdriver.enabled": False,
+                "useAutomationExtension": False,
+            },
+        )
+    if name == "webkit": return launcher.launch(headless=False)
 
 # Check if the appointment for the NIE is available
 def check_nie_appointment(page, cfg: Config) -> bool:
@@ -172,7 +199,7 @@ def main() -> None:
 
     with sync_playwright() as pw:
         # Set up the browser
-        browser = getattr(pw, cfg.browser).launch(headless=False)
+        browser = launch_browser(pw, cfg.browser)
         context = browser.new_context(locale="es-ES")
         page = context.new_page()
 
