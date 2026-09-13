@@ -48,6 +48,24 @@ REQUIRED = [
     "FULL_NAME", "BIRTH_YEAR", "COUNTRY", "MIN_WAIT", "MAX_WAIT",
 ]
 
+# Human-like wait to avoid bot detection
+def human_sleep(min_s: int = 1, max_s: int = 5) -> None:
+    time.sleep(random.uniform(min_s, max_s))
+
+# Human-like fill for text fields to avoid bot detection
+def human_fill(page, selector: str, text: str) -> None:
+    human_sleep(1, 2)
+    page.click(selector)
+    # 70 and 160 stand for the millisecond wait per key
+    page.type(selector, text, delay=random.uniform(70, 160))
+
+# Human-like button click to avoid bot detection
+def human_click(page, selector: str) -> None:
+    page.hover(selector)
+    human_sleep(1, 2)
+    # 60 and 140 stand for the delay between down-up
+    page.click(selector, delay=random.uniform(60, 140))
+
 # Function to load the configuration file and parse input values
 def load_config(path: str = "config.toml") -> Config:
     raw = tomllib.loads(Path(path).read_text(encoding="utf-8"))
@@ -106,26 +124,32 @@ def check_nie_appointment(page, cfg: Config) -> bool:
     page.goto(cfg.base_url)
     
     # Page 1: Motive selection
+    human_sleep(3, 8) # Simulate reading page
     page.select_option(MOTIVE_SELECTION, value=cfg.motive)
-    page.click(ACCEPT_BUTTON)
+    human_sleep()
+    human_click(page, ACCEPT_BUTTON)
 
     # Page 2: Info page
-    page.click(CONTINUE_BUTTON)
+    human_sleep(3, 8) # Simulate reading page
+    human_click(page, CONTINUE_BUTTON)
 
     # Page 3: Personal data form
+    human_sleep(3, 8) # Simulate reading page
     if cfg.doc_type == "nie":
-        page.check(RADIAL_NIE)
+        human_click(page, RADIAL_NIE)
     else:
-        page.check(RADIAL_PASSPORT)
+        human_click(page, RADIAL_PASSPORT)
 
-    page.fill(DOC_NUMBER_TEXT, cfg.doc_number)
-    page.fill(FULL_NAME_TEXT, cfg.full_name)
-    page.fill(BIRTHYEAR_TEXT, str(cfg.birth_year))
+    human_fill(page, DOC_NUMBER_TEXT, cfg.doc_number)
+    human_fill(page, FULL_NAME_TEXT, cfg.full_name)
+    human_fill(page, BIRTHYEAR_TEXT, str(cfg.birth_year))
+    human_sleep(1, 2)
     page.select_option(NATIONALITY_SELECT, label=cfg.country)
-    page.click(SEND_BUTTON)
+    human_click(page, SEND_BUTTON)
 
     # Page 4: Confirm
-    page.click(CONTINUE_BUTTON)
+    human_sleep(3, 8) # Simulate reading page
+    human_click(page, CONTINUE_BUTTON)
 
     # Page 5: Result, info banner means no appointments, office picker means availability
     page.wait_for_selector(
