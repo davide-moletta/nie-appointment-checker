@@ -176,7 +176,7 @@ def check_nie_appointment(page, cfg: Config) -> bool:
 
     # Page 4: Confirm
     human_sleep(3, 8) # Simulate reading page
-    human_click(page, CONTINUE_BUTTON)
+    human_click(page, SEND_BUTTON)
 
     # Page 5: Result, info banner means no appointments, office picker means availability
     page.wait_for_selector(
