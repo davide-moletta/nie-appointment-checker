@@ -1,0 +1,134 @@
+# Base URL, change the value of p as needed according to the province codes below
+# | p=15 -> A Coruña    | p=16 -> Cuenca       | p=30 -> Murcia
+# | p=2 -> Albacete     | p=20 -> Gipuzkoa     | p=31 -> Navarra
+# | p=3 -> Alicante     | p=17 -> Girona       | p=32 -> Ourense
+# | p=4 -> Almería      | p=18 -> Granada      | p=34 -> Palencia
+# | p=1 -> Araba        | p=19 -> Guadalajara  | p=36 -> Pontevedra
+# | p=33 -> Asturias    | p=21 -> Huelva       | p=37 -> Salamanca
+# | p=5 -> Ávila        | p=22 -> Huesca       | p=38 -> S.Cruz Tenerife
+# | p=6 -> Badajoz      | p=7 -> Illes Balears | p=40 -> Segovia
+# | p=8 -> Barcelona    | p=23 -> Jaén         | p=41 -> Sevilla
+# | p=48 -> Bizkaia     | p=26 -> La Rioja     | p=42 -> Soria
+# | p=9 -> Burgos       | p=35 -> Las Palmas   | p=43 -> Tarragona
+# | p=10 -> Cáceres     | p=24 -> León         | p=44 -> Teruel
+# | p=11 -> Cádiz       | p=25 -> Lleida       | p=45 -> Toledo
+# | p=39 -> Cantabria   | p=27 -> Lugo         | p=46 -> Valencia
+# | p=12 -> Castellón   | p=28 -> Madrid       | p=47 -> Valladolid
+# | p=51 -> Ceuta       | p=29 -> Málaga       | p=49 -> Zamora
+# | p=13 -> Ciudad Real | p=52 -> Melilla      | p=50 -> Zaragoza
+# | p=14 -> Córdoba
+BASE_URL = "https://icp.administracionelectronica.gob.es/icpplustieb/citar?p=8&locale=es"
+
+# Request motive, change the value as needed according to the tramite codes below for Barcelona
+# If you are targeting a different province check the website for the correct value
+# -1 -> Despliega para ver trámites disponibles en esta provincia
+# 20 -> AUTORIZACIÓN DE REGRESO
+# 4118 -> POLICIA - CERTIFICADOS CONCORDANCIA
+# 4036 -> POLICIA - RECOGIDA DE TARJETA DE IDENTIDAD DE EXTRANJERO (TIE)
+# 4092 -> POLICIA - TÍTULOS DE VIAJE
+# 4067 -> POLICIA - EXPEDICIÓN/RENOVACIÓN DE DOCUMENTOS DE SOLICITANTES DE ASILO
+# 4031 -> POLICIA - ASIGNACIÓN DE NIE
+# 4037 -> POLICIA - CARTA DE INVITACIÓN
+# 4038 -> POLICIA - CERTIFICADO DE REGISTRO DE CIUDADANO DE LA U.E.
+# 4049 -> POLICIA - CERTIFICADOS (DE RESIDENCIA, DE NO RESIDENCIA Y DE CONCORDANCIA)
+# 4096 -> POLICIA - CERTIFICADOS Y ASIGNACION NIE
+# 4079 -> POLICIA - CERTIFICADOS Y ASIGNACION NIE (NO COMUNITARIOS)
+# 4112 -> POLICÍA - TARJETA CONFLICTO UCRANIA–ПОЛІЦІЯ -КАРТКА ДЛЯ ПЕРЕМІЩЕНИХ ОСІБ ВНАСЛІДОК КОНФЛІКТУ В УКРАЇНІ
+# 4130 -> POLICÍA - ASIGNACIÓN NIE NO RESIDENTE NO COMUNITARIO
+# 4131 -> POLICÍA - CERTIFICADOS (RESIDENCIA Y CONCORDANCIA)
+# 4094 -> POLICÍA - EXP.TARJETA ASOCIADA AL ACUERDO DE RETIRADA CIUDADANOS BRITÁNICOS Y SUS FAMILIARES (BREXIT)
+# 4047 -> POLICÍA - EXPEDICIÓN DE TARJETAS CUYA AUTORIZACIÓN RESUELVE LA DIRECCIÓN GENERAL DE GESTIÓN MIGRATORIA
+# 4010 -> POLICÍA - TOMA DE HUELLAS (EXPEDICIÓN DE TARJETA) INICIAL, RENOVACIÓN, DUPLICADO Y LEY 14/2013
+MOTIVE = "4031"
+
+# Target office, change the value as needed according to the office codes below for Barcelona
+# If you are targeting a different province check the website for the correct value
+# 99 -> Cualquier oficina
+# 18 -> CNP COMISARIA BADALONA, AVDA. DELS VENTS, 9, BADALONA
+# 19 -> CNP COMISARIA CASTELLDEFELS, PLAÇA DE L`ESPERANTO, 4, CASTELLDEFELS
+# 20 -> CNP COMISARIA CERDANYOLA DEL VALLES, VERGE DE LES FEIXES, 4, CERDANYOLA DEL VALLES
+# 21 -> CNP COMISARIA CORNELLA DE LLOBREGAT, AV. SANT ILDEFONS, S/N, CORNELLA DE LLOBREGAT
+# 23 -> CNP COMISARIA EL PRAT DE LLOBREGAT, CENTRE, 4, EL PRAT DE LLOBREGAT
+# 28 -> CNP COMISARIA GRANOLLERS, RICOMA, 65, GRANOLLERS
+# 26 -> CNP COMISARIA IGUALADA, PRAT DE LA RIBA, 13, IGUALADA
+# 17 -> CNP COMISARIA LHOSPITALET DE LLOBREGAT, Rbla. Just Oliveres, 43, L`HOSPITALET DE LLOBREGAT
+# 38 -> CNP COMISARIA MANRESA, SOLER I MARCH, 5, MANRESA
+# 27 -> CNP COMISARIA MATARO, AV. GATASSA, 15, MATARO
+# 31 -> CNP COMISARIA MONTCADA I REIXAC, MAJOR, 38, MONTCADA I REIXAC
+# 32 -> CNP COMISARIA RIPOLLET, TAMARIT, 78, RIPOLLET
+# 29 -> CNP COMISARIA RUBI, TERRASSA, 16, RUBI
+# 30 -> CNP COMISARIA SABADELL, BATLLEVELL, 115, SABADELL
+# 33 -> CNP COMISARIA SANT ADRIA DEL BESOS, AV. JOAN XXIII, 2, SANT ADRIA DEL BESOS
+# 24 -> CNP COMISARIA SANT BOI DE LLOBREGAT, RIERA BASTÉ, 43, SANT BOI DE LLOBREGAT
+# 34 -> CNP COMISARIA SANT CUGAT DEL VALLES, VALLES, 1, SANT CUGAT DEL VALLES
+# 22 -> CNP COMISARIA SANT FELIU DE LLOBREGAT, CARRERETES, 9, SANT FELIU DE LLOBREGAT
+# 35 -> CNP COMISARIA SANTA COLOMA DE GRAMENET, IRLANDA, 67, SANTA COLOMA DE GRAMENET
+# 36 -> CNP COMISARIA TERRASSA, BALDRICH, 13, TERRASSA
+# 37 -> CNP COMISARIA VIC, BISBE MORGADES, 4, VIC
+# 25 -> CNP COMISARIA VILADECANS, AVDA. BALLESTER, 2, VILADECANS
+# 46 -> CNP COMISARIA VILAFRANCA DEL PENEDES, Avinguda Ronda del Mar, 109, VILAFRANCA DEL PENEDES
+# 49 -> CNP COMISARIA VILANOVA I LA GELTRU, CARRER D`OLÉRDOLA, 47, Vilanova i la Geltrú
+# 47 -> CNP GUADALAJARA, Guadalajara, 1, Barcelona
+# 14 -> CNP MALLORCA GRANADOS, MALLORCA, 213, BARCELONA
+# 43 -> CNP PSJ PLANTA BAJA, PASSEIG SANT JOAN, 189, BARCELONA
+# 16 -> CNP RAMBLA GUIPUSCOA 74, RAMBLA GUIPUSCOA, 74, BARCELONA
+OFFICE = "99"
+
+# Document type, can be "nie" or "passport"
+DOC_TYPE = "passport"
+# Document number
+DOC_NUMBER = ""
+# Full legal name
+FULL_NAME = ""
+# Year of birth
+BIRTH_YEAR = 0
+
+# Nationality, this needs to be provided in Spanish, search in the table below your country 
+# | Afghanistan -> AFGANISTAN | Albania -> ALBANIA | Germany -> ALEMANIA | Andorra -> ANDORRA | Angola -> ANGOLA | Anguilla -> ANGUILLA |
+# | Antigua and Barbuda -> ANTIGUA Y BARBUDA | Netherlands Antilles -> ANTILLAS NL. | Stateless -> APATRIDA | Saudi Arabia -> ARABIA SAUDI | Algeria -> ARGELIA | Argentina -> ARGENTINA |
+# | Armenia -> ARMENIA | Aruba -> ARUBA | Australia -> AUSTRALIA | Austria -> AUSTRIA | Azerbaijan -> AZERBAYAN | Bahamas -> BAHAMAS |
+# | Bahrain -> BAHREIN | Bangladesh -> BANGLADESH | Barbados -> BARBADOS | Belgium -> BELGICA | Belize -> BELICE | Benin -> BENIN |
+# | Bhutan -> BHUTAN | Belarus -> BIELORRUSIA O BELARUS | Bolivia -> BOLIVIA | Bosnia and Herzegovina -> BOSNIA-HERZEGOVINA | Botswana -> BOTSWANA | Brazil -> BRASIL |
+# | Brunei -> BRUNEI DARUSSALAM | Bulgaria -> BULGARIA | Burkina Faso -> BURKINA FASO | Burundi -> BURUNDI | Cape Verde (Cabo Verde) -> CABO VERDE | Cambodia -> CAMBOYA |
+# | Cameroon -> CAMERUN | Canada -> CANADA | Central African Republic -> CENTROAFRICA REPUBLICA | Chad -> CHAD | Chile -> CHILE | China -> CHINA |
+# | Cyprus -> CHIPRE | Colombia -> COLOMBIA | Comoros -> COMORES | Republic of the Congo -> CONGO BRAZZAVILLE | North Korea -> COREA, REP. POP. DEMOC. | South Korea -> COREA, REPUBLICA |
+# | Ivory Coast -> COSTA DE MARFIL | Costa Rica -> COSTA RICA | Croatia -> CROACIA | Cuba -> CUBA | Denmark -> DINAMARCA | Djibouti -> DJIBOUTI |
+# | Dominica -> DOMINICA | Dominican Republic -> DOMINICANA REPUBLICA | Ecuador -> ECUADOR | United States -> EEUU | Egypt -> EGIPTO | El Salvador -> EL SALVADOR |
+# | Vatican City -> EL VATICANO | United Arab Emirates -> EMIRATOS ARABES UNIDOS | Eritrea -> ERITREA | Slovakia -> ESLOVAQUIA | Slovenia -> ESLOVENIA | Spain -> ESPAÑA |
+# | Estonia -> ESTONIA | Ethiopia -> ETIOPIA | Fiji -> FIDJI | Philippines -> FILIPINAS | Finland -> FINLANDIA | France -> FRANCIA |
+# | Gabon -> GABON | Gambia -> GAMBIA | Georgia -> GEORGIA | Ghana -> GHANA | Grenada -> GRANADA REPUBLICA | Greece -> GRECIA |
+# | Guatemala -> GUATEMALA | Guyana -> GUAYANA | Equatorial Guinea -> GUINEA ECUATORIAL | Guinea -> GUINEA REPUBLICA | Guinea-Bissau -> GUINEA-BISSAU | Haiti -> HAITI |
+# | Netherlands -> HOLANDA | Honduras -> HONDURAS | Hungary -> HUNGRIA | India -> INDIA | Indonesia -> INDONESIA | Iraq -> IRAK |
+# | Iran -> IRAN | Ireland -> IRLANDA | Iceland -> ISLANDIA | Marshall Islands -> ISLAS MARSCHALL | Israel -> ISRAEL | Italy -> ITALIA |
+# | Jamaica -> JAMAICA | Japan -> JAPON | Jordan -> JORDANIA | Kazakhstan -> KAZAJSTAN | Kenya -> KENIA | Kyrgyzstan -> KIRGUISTAN |
+# | Kiribati -> KIRIBATI | Kuwait -> KUWAIT | Laos -> LAOS | Maldives -> LAS MALDIVAS | Lesotho -> LESOTHO | Latvia -> LETONIA |
+# | Lebanon -> LIBANO | Liberia -> LIBERIA | Libya -> LIBIA | Liechtenstein -> LIECHTENSTEIN | Lithuania -> LITUANIA | Luxembourg -> LUXEMBURGO |
+# | Macao -> MACAO | North Macedonia -> MACEDONIA | Madagascar -> MADAGASCAR | Malaysia -> MALASIA | Malaysia - Great Britain -> MALASIA - GRAN BRETAÑA | Malawi -> MALAWI |
+# | Mali -> MALI | Malta -> MALTA | Morocco -> MARRUECOS | Mauritius -> MAURICIO | Mauritania -> MAURITANIA | Mexico -> MEJICO |
+# | Micronesia -> MICRONESIA | Moldova -> MOLDAVIA | Monaco -> MONACO | Mongolia -> MONGOLIA | Montenegro -> MONTENEGRO | Mozambique -> MOZAMBIQUE |
+# | Myanmar -> MYANMAR | Namibia -> NAMIBIA | Nauru -> NAURU | Nepal -> NEPAL | Nicaragua -> NICARAGUA | Niger -> NIGER |
+# | Nigeria -> NIGERIA | Norway -> NORUEGA | New Zealand -> NUEVA ZELANDA | Oman -> OMAN | Pakistan -> PAKISTAN | Palau -> PALAOS |
+# | Palestine -> PALESTINA | Panama -> PANAMA | Papua New Guinea -> PAPUA NUEVA GUINEA | Paraguay -> PARAGUAY | Peru -> PERU | Poland -> POLONIA |
+# | Portugal -> PORTUGAL | Puerto Rico -> PUERTO RICO | Qatar -> QATAR | United Kingdom -> REINO UNIDO | DR Congo (ex-Zaire) -> REP. DEMOCRATICA DEL CONGO (EX-ZAIRE) | Czech Republic -> REPUBLICA CHECA |
+# | Réunion - Comoros -> REUNION-COMO | Rwanda -> RUANDA | Romania -> RUMANIA | Russia -> RUSIA | Solomon Islands -> SALOMON | Western Samoa -> SAMOA OCCIDENTAL |
+# | Saint Kitts and Nevis -> SAN CRISTOBAL Y NEVIS | San Marino -> SAN MARINO | Saint Vincent -> SAN VICENTE | Saint Lucia -> SANTA LUCIA | Sao Tome and Principe -> SANTO TOME Y PRINCIPE | Seychelles -> SEICHELLES |
+# | Senegal -> SENEGAL | Senegambia -> SENEGAMBIA | Serbia -> SERBIA | Sierra Leone -> SIERRA LEONA | Singapore -> SINGAPUR | Syria -> SIRIA |
+# | Somalia -> SOMALIA | Sri Lanka -> SRI LANKA | South Africa -> SUDAFRICA | Sudan -> SUDAN | Sweden -> SUECIA | Switzerland -> SUIZA |
+# | Suriname -> SURINAM | Eswatini (Swaziland) -> SWAZILANDIA | Tajikistan -> TADJIKISTAN | Taiwan -> TAIWAN | Tanzania -> TANZANIA | Thailand -> THAILANDIA |
+# | East Timor -> TIMOR ORIENTAL | Togo -> TOGO | Tonga -> TONGA | Trinidad and Tobago -> TRINIDAD Y TOBAGO | Tunisia -> TUNEZ | Turkmenistan -> TURKMENIA |
+# | Turkey -> TURQUIA | Tuvalu -> TUVALU | Ukraine -> UCRANIA | Uganda -> UGANDA | Uruguay -> URUGUAY | Uzbekistan -> UZBEKISTAN |
+# | Vanuatu -> VANUATU | Venezuela -> VENEZUELA | Vietnam -> VIETNAM | Yemen -> YEMEN | Zambia -> ZAMBIA 
+COUNTRY = ""
+
+# Provide the minimum and maximum wait time in minutes
+# The actual wait time will be a random value between these two (note: MIN_WAIT must be lower than MAX_WAIT)
+# It is advised to use rational number to avoid blocks
+MIN_WAIT = 15
+MAX_WAIT = 60
+
+# Browser engine, can be "chromium", "firefox" or "webkit"
+BROWSER = "chromium"
+
+# Telegram settings, you can get these values from "BotFather" and "userinfobot" respectively
+TELEGRAM_BOT_TOKEN = ""
+TELEGRAM_CHAT_ID = ""
