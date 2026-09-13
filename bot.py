@@ -203,26 +203,34 @@ def main() -> None:
         context = browser.new_context(locale="es-ES")
         page = context.new_page()
 
-        while True:
-            # Check if the appointment is available
+        try:
+            while True:
+                # Check if the appointment is available
+                try:
+                    found = check_nie_appointment(page, cfg)
+                except KeyboardInterrupt:
+                    raise
+                except Exception as e:
+                    print(f"[!] flow error: {e}")
+                    found = False
+
+                # If there is an appointment print a note and stop
+                if found:
+                    print("Appointment available, complete the process manually")
+                    input("Pause, press Enter to restart the loop or Ctrl+C to exit")
+                    break
+
+                # Wait until next request
+                wait = random.randint(cfg.min_wait, cfg.max_wait)
+                print(f"No available appointments, next check in {wait / 60} min")
+                time.sleep(wait)
+        except KeyboardInterrupt:
+            print("\nShutting down gracefully...")
+        finally:
             try:
-                found = check_nie_appointment(page, cfg)
-            except Exception as e:
-                print(f"[!] flow error: {e}")
-                found = False
-
-            # If there is an appointment print a note and stop
-            if found:
-                print("Appointment available, complete the process manually")
-                input("Pause, press Enter to restart the loop or Ctrl+C to exit")
-                break
-
-            # Wait until next request
-            wait = random.randint(cfg.min_wait, cfg.max_wait)
-            print(f"No available appointments, next check in {wait / 60} min")
-            time.sleep(wait)
-
-        browser.close()
+                browser.close()
+            except Exception:
+                pass
 
 if __name__ == "__main__":
     main()

@@ -65,6 +65,5 @@ written exactly as it appears in the nationality dropdown.
 - Telegram notification on found slots
 - Timestamp log for every check
 - Detect the WAF rejection page and back off automatically
-- Graceful Ctrl+C shutdown
 - Config hot-reload each loop (tune waits without restarting)
 - Optional headless mode for unattended monitoring
