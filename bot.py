@@ -1,7 +1,11 @@
+import subprocess
+import sys
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from pprint import pprint
+
+from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 
 BROWSERS = {"chromium", "firefox", "webkit"}
 DEFAULT_BROWSER = "firefox"
@@ -65,9 +69,26 @@ def load_config(path: str = "config.toml") -> Config:
 
     return cfg
 
+# Install the browser engine if it is not already installed
+def install_browser(browser: str) -> None:
+    # Try to run the browser to see if the engine is present
+    try:
+        with sync_playwright() as pw:
+            b = getattr(pw, browser).launch(headless=True)
+            b.close()
+        return
+    except Exception:
+        pass
+
+    print(f"Browser '{browser}' not installed, downloading...")
+    subprocess.run([sys.executable, "-m", "playwright", "install", browser], check=True)
+    print(f"Browser '{browser}' installed")
+
 def main() -> None:
     cfg = load_config()
     pprint(f"{cfg}")
+
+    install_browser(cfg.browser)
 
 if __name__ == "__main__":
     main()
