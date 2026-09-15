@@ -47,6 +47,14 @@ always means one of the values you entered does not match the portal, check
 your trámite code matches the province in `BASE_URL`, and that `COUNTRY` is
 written exactly as it appears in the nationality dropdown.
 
+### Telegram notification (optional)
+
+If you whish to use Telegram notification follow these steps:
+
+1. Open [@BotFather](https://t.me/BotFather), send `/newbot`, follow the prompts to get a token like `123456:ABC-...`
+2. Send any message to your new bot, then ask [@userinfobot](https://t.me/userinfobot) for your chat ID
+3. Fill both values in `config.toml` under `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` respectively
+
 ## Project structure
 
 ```bash
@@ -62,7 +70,6 @@ written exactly as it appears in the nationality dropdown.
 
 ## TODO
 
-- Telegram notification on found slots
 - Timestamp log for every check
 - Detect the WAF rejection page and back off automatically
 - Config hot-reload each loop (tune waits without restarting)

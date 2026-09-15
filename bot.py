@@ -3,6 +3,8 @@ import random
 import sys
 import tomllib
 import time
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from pprint import pprint
@@ -15,6 +17,7 @@ LOCAL_BROWSERS = {"chrome", "msedge"}
 ALL_BROWSERS = BROWSER_ENGINES | LOCAL_BROWSERS
 
 NO_CITAS_TEXT = "En este momento no hay citas disponibles"
+TELEGRAM_MESSAGE = "There is an available appointment, complete the reservation manually"
 
 # HTML elements
 MOTIVE_SELECTION = "select[id^='tramiteGrupo']"
@@ -191,6 +194,23 @@ def check_nie_appointment(page, cfg: Config) -> bool:
         return True
     raise RuntimeError("unexpected result page — layout changed?")
 
+# Send a message via Telegram to the configured chat
+def notify_telegram(cfg: Config, message: str) -> None:
+    if not cfg.telegram_bot_token or not cfg.telegram_chat_id:
+        print("Telegram not configured, skipping notification")
+        return
+
+    url = f"https://api.telegram.org/bot{cfg.telegram_bot_token}/sendMessage"
+    data = urllib.parse.urlencode({
+        "chat_id": cfg.telegram_chat_id,
+        "text": message,
+    }).encode()
+
+    try:
+        urllib.request.urlopen(url, data=data, timeout=15)
+    except Exception as e:
+        print(f"Telegram notification failed: {e}")
+
 def main() -> None:
     cfg = load_config()
     pprint(f"{cfg}")
@@ -217,6 +237,7 @@ def main() -> None:
                 # If there is an appointment print a note and stop
                 if found:
                     print("Appointment available, complete the process manually")
+                    notify_telegram(cfg, TELEGRAM_MESSAGE)
                     input("Pause, press Enter to restart the loop or Ctrl+C to exit")
                     break
 
