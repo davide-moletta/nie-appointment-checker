@@ -35,6 +35,12 @@ NATIONALITY_SELECT = "#txtPaisNac"
 INFO_MSG_NO_APPOINTMENTS = ".mf-msg__info"
 RESULT_OFFICES  = "select[id^='idSede']"
 
+# Wait times
+MIN_HUMAN_SLEEP = 3
+MAX_HUMAN_SLEEP = 5
+FAST_MIN_HUMAN_SLEEP = 3
+FAST_MAX_HUMAN_SLEEP = 5
+
 @dataclass
 class Config:
     base_url: str
@@ -58,12 +64,12 @@ REQUIRED = [
 ]
 
 # Human-like wait to avoid bot detection
-def human_sleep(min_s: int = 1, max_s: int = 5) -> None:
+def human_sleep(min_s, max_s) -> None:
     time.sleep(random.uniform(min_s, max_s))
 
 # Human-like fill for text fields to avoid bot detection
 def human_fill(page, selector: str, text: str) -> None:
-    human_sleep(1, 2)
+    human_sleep(FAST_MIN_HUMAN_SLEEP, FAST_MAX_HUMAN_SLEEP)
     page.click(selector)
     # 70 and 160 stand for the millisecond wait per key
     page.type(selector, text, delay=random.uniform(70, 160))
@@ -71,7 +77,7 @@ def human_fill(page, selector: str, text: str) -> None:
 # Human-like button click to avoid bot detection
 def human_click(page, selector: str) -> None:
     page.hover(selector)
-    human_sleep(1, 2)
+    human_sleep(FAST_MIN_HUMAN_SLEEP, FAST_MAX_HUMAN_SLEEP)
     # 60 and 140 stand for the delay between down-up
     page.click(selector, delay=random.uniform(60, 140))
 
@@ -165,17 +171,17 @@ def check_nie_appointment(page, cfg: Config) -> bool | None:
         return None
     
     # Page 1: Motive selection
-    human_sleep(3, 8) # Simulate reading page
+    human_sleep(MIN_HUMAN_SLEEP, MAX_HUMAN_SLEEP) # Simulate reading page
     page.select_option(MOTIVE_SELECTION, value=cfg.motive)
-    human_sleep()
+    human_sleep(FAST_MIN_HUMAN_SLEEP, FAST_MAX_HUMAN_SLEEP)
     human_click(page, ACCEPT_BUTTON)
 
     # Page 2: Info page
-    human_sleep(3, 8) # Simulate reading page
+    human_sleep(MIN_HUMAN_SLEEP, MAX_HUMAN_SLEEP) # Simulate reading page
     human_click(page, CONTINUE_BUTTON)
 
     # Page 3: Personal data form
-    human_sleep(3, 8) # Simulate reading page
+    human_sleep(MIN_HUMAN_SLEEP, MAX_HUMAN_SLEEP) # Simulate reading page
     if cfg.doc_type == "nie":
         human_click(page, RADIAL_NIE)
     else:
@@ -184,12 +190,12 @@ def check_nie_appointment(page, cfg: Config) -> bool | None:
     human_fill(page, DOC_NUMBER_TEXT, cfg.doc_number)
     human_fill(page, FULL_NAME_TEXT, cfg.full_name)
     human_fill(page, BIRTHYEAR_TEXT, str(cfg.birth_year))
-    human_sleep(1, 2)
+    human_sleep(MIN_HUMAN_SLEEP, MAX_HUMAN_SLEEP)
     page.select_option(NATIONALITY_SELECT, label=cfg.country)
     human_click(page, SEND_BUTTON)
 
     # Page 4: Confirm
-    human_sleep(3, 8) # Simulate reading page
+    human_sleep(MIN_HUMAN_SLEEP, MAX_HUMAN_SLEEP) # Simulate reading page
     human_click(page, SEND_BUTTON)
 
     # Page 5: Result, info banner means no appointments, office picker means availability
