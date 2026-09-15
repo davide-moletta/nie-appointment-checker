@@ -17,7 +17,9 @@ LOCAL_BROWSERS = {"chrome", "msedge"}
 ALL_BROWSERS = BROWSER_ENGINES | LOCAL_BROWSERS
 
 NO_CITAS_TEXT = "En este momento no hay citas disponibles"
+WAF_BLOCK_TEXT = "The requested URL was rejected"
 TELEGRAM_MESSAGE = "There is an available appointment, complete the reservation manually"
+TELEGRAM_WAF_BLOCK_MESSAGE = "Bot blocked by the WAF, backing off"
 
 # HTML elements
 MOTIVE_SELECTION = "select[id^='tramiteGrupo']"
@@ -45,13 +47,14 @@ class Config:
     country: str
     min_wait: int
     max_wait: int
+    waf_backoff: int
     telegram_bot_token: str
     telegram_chat_ids: list[str]
     browser: str
 
 REQUIRED = [
     "BASE_URL", "MOTIVE", "OFFICE", "DOC_TYPE", "DOC_NUMBER",
-    "FULL_NAME", "BIRTH_YEAR", "COUNTRY", "MIN_WAIT", "MAX_WAIT",
+    "FULL_NAME", "BIRTH_YEAR", "COUNTRY", "MIN_WAIT", "MAX_WAIT", "WAF_BACKOFF"
 ]
 
 # Human-like wait to avoid bot detection
@@ -92,6 +95,7 @@ def load_config(path: str = "config.toml") -> Config:
         country = raw["COUNTRY"],
         min_wait = int(raw["MIN_WAIT"]) * 60, # Convert to seconds
         max_wait = int(raw["MAX_WAIT"]) * 60, # Convert to seconds
+        waf_backoff = int(raw["WAF_BACKOFF"]) * 60, # Convert to seconds
         telegram_bot_token = raw.get("TELEGRAM_BOT_TOKEN", ""),
         telegram_chat_ids = [str(x) for x in raw.get("TELEGRAM_CHAT_IDS", [])],
         browser = str(raw.get("BROWSER", DEFAULT_BROWSER)).lower(),
@@ -149,9 +153,16 @@ def launch_browser(pw, name: str):
     if name == "webkit": return launcher.launch(headless=False)
 
 # Check if the appointment for the NIE is available
-def check_nie_appointment(page, cfg: Config) -> bool:
+def check_nie_appointment(page, cfg: Config) -> bool | None:
     # Go to starting page
     page.goto(cfg.base_url)
+
+    # WAF rejection page, wait a long backoff and try again
+    if WAF_BLOCK_TEXT in page.content():
+        print("WAF blocked this session, backing off")
+        notify_telegram(cfg, TELEGRAM_WAF_BLOCK_MESSAGE)
+        time.sleep(cfg.waf_backoff)
+        return None
     
     # Page 1: Motive selection
     human_sleep(3, 8) # Simulate reading page
@@ -232,8 +243,12 @@ def main() -> None:
                 except KeyboardInterrupt:
                     raise
                 except Exception as e:
-                    print(f"[!] flow error: {e}")
+                    print(f"Flow error: {e}")
                     found = False
+
+                # WAF backoff already slept, start next check right away
+                if found is None:
+                    continue
 
                 # If there is an appointment print a note and stop
                 if found:

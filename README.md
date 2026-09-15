@@ -71,6 +71,5 @@ If you whish to use Telegram notification follow these steps:
 ## TODO
 
 - Timestamp log for every check
-- Detect the WAF rejection page and back off automatically
 - Config hot-reload each loop (tune waits without restarting)
 - Optional headless mode for unattended monitoring

@@ -126,6 +126,9 @@ COUNTRY = ""
 MIN_WAIT = 15
 MAX_WAIT = 60
 
+# Minutes to wait when the WAF rejects the session
+WAF_BACKOFF = 90
+
 # Browser engine, can be "chromium", "firefox" or "webkit"
 # This supports also locally isntalled Browsers with "chrome" or "msedge"
 # Note that you need to have these browsers installed for these options to work
