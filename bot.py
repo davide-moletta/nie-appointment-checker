@@ -46,7 +46,7 @@ class Config:
     min_wait: int
     max_wait: int
     telegram_bot_token: str
-    telegram_chat_id: str
+    telegram_chat_ids: list[str]
     browser: str
 
 REQUIRED = [
@@ -93,7 +93,7 @@ def load_config(path: str = "config.toml") -> Config:
         min_wait = int(raw["MIN_WAIT"]) * 60, # Convert to seconds
         max_wait = int(raw["MAX_WAIT"]) * 60, # Convert to seconds
         telegram_bot_token = raw.get("TELEGRAM_BOT_TOKEN", ""),
-        telegram_chat_id = str(raw.get("TELEGRAM_CHAT_ID", "")),
+        telegram_chat_ids = [str(x) for x in raw.get("TELEGRAM_CHAT_IDS", [])],
         browser = str(raw.get("BROWSER", DEFAULT_BROWSER)).lower(),
     )
 
@@ -196,20 +196,21 @@ def check_nie_appointment(page, cfg: Config) -> bool:
 
 # Send a message via Telegram to the configured chat
 def notify_telegram(cfg: Config, message: str) -> None:
-    if not cfg.telegram_bot_token or not cfg.telegram_chat_id:
+    if not cfg.telegram_bot_token or not cfg.telegram_chat_ids:
         print("Telegram not configured, skipping notification")
         return
 
     url = f"https://api.telegram.org/bot{cfg.telegram_bot_token}/sendMessage"
-    data = urllib.parse.urlencode({
-        "chat_id": cfg.telegram_chat_id,
-        "text": message,
-    }).encode()
+    for chat_id in cfg.telegram_chat_ids:
+        data = urllib.parse.urlencode({
+            "chat_id": chat_id,
+            "text": message,
+        }).encode()
+        try:
+            urllib.request.urlopen(url, data=data, timeout=15)
+        except Exception as e:
+            print(f"Telegram failed for chat {chat_id}: {e}")
 
-    try:
-        urllib.request.urlopen(url, data=data, timeout=15)
-    except Exception as e:
-        print(f"Telegram notification failed: {e}")
 
 def main() -> None:
     cfg = load_config()
