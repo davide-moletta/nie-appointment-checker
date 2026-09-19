@@ -244,6 +244,7 @@ def main() -> None:
 
     cfg = load_config()
     logging.info(f"{cfg}")
+    config_mtime = Path("config.toml").stat().st_mtime
 
     install_browser(cfg.browser)
 
@@ -280,6 +281,18 @@ def main() -> None:
                 next_check = datetime.now() + timedelta(seconds=wait)
                 logging.info(f"No available appointments, next check at {next_check.strftime('%H:%M')}")
                 time.sleep(wait)
+
+                # Reload the config only if the file changed on disk
+                try:
+                    mtime = Path("config.toml").stat().st_mtime
+                except FileNotFoundError:
+                    logging.warning("config.toml not found, keeping the previous configuration")
+                else:
+                    if mtime != config_mtime:
+                        logging.info("Config file changed, reloading the configuration ...")
+                        cfg = load_config()
+                        config_mtime = mtime
+
         except KeyboardInterrupt:
             logging.info("Shutting down gracefully...")
         finally:

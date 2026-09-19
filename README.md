@@ -70,5 +70,4 @@ If you whish to use Telegram notification follow these steps:
 
 ## TODO
 
-- Config hot-reload each loop (tune waits without restarting)
 - Optional headless mode for unattended monitoring
