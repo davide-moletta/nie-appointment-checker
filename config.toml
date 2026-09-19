@@ -124,7 +124,7 @@ COUNTRY = ""
 # The actual wait time will be a random value between these two (note: MIN_WAIT must be lower than MAX_WAIT)
 # It is advised to use rational number to avoid blocks
 MIN_WAIT = 15
-MAX_WAIT = 60
+MAX_WAIT = 50
 
 # Minutes to wait when the WAF rejects the session
 WAF_BACKOFF = 90
