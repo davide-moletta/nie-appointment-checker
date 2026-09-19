@@ -274,7 +274,7 @@ def main() -> None:
                     logging.info("Appointment available, complete the process manually")
                     notify_telegram(cfg, TELEGRAM_MESSAGE)
                     input("Pause, press Enter to restart the loop or Ctrl+C to exit")
-                    break
+                    continue
 
                 # Wait until next request
                 wait = random.randint(cfg.min_wait, cfg.max_wait)
