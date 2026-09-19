@@ -70,6 +70,5 @@ If you whish to use Telegram notification follow these steps:
 
 ## TODO
 
-- Timestamp log for every check
 - Config hot-reload each loop (tune waits without restarting)
 - Optional headless mode for unattended monitoring

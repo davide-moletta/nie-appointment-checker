@@ -5,10 +5,10 @@ import tomllib
 import time
 import urllib.parse
 import urllib.request
+import logging
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
-from pprint import pprint
-
 from playwright.sync_api import sync_playwright
 
 BROWSER_ENGINES = {"chromium", "firefox", "webkit"}
@@ -133,9 +133,10 @@ def install_browser(browser: str) -> None:
     except Exception:
         pass
 
-    print(f"Browser '{browser}' not installed, downloading...")
+    logging.info(f"Browser '{browser}' not installed, downloading...")
     subprocess.run([sys.executable, "-m", "playwright", "install", browser], check=True)
-    print(f"Browser '{browser}' installed")
+    logging.info(f"Browser '{browser}' installed")
+
 
 # Launch the configured browser
 def launch_browser(pw, name: str):
@@ -165,11 +166,12 @@ def check_nie_appointment(page, cfg: Config) -> bool | None:
 
     # WAF rejection page, wait a long backoff and try again
     if WAF_BLOCK_TEXT in page.content():
-        print("WAF blocked this session, backing off")
+        retry_at = datetime.now() + timedelta(seconds=cfg.waf_backoff)
+        logging.warning(f"WAF blocked this session, backing off until {retry_at.strftime('%H:%M')}")
         notify_telegram(cfg, TELEGRAM_WAF_BLOCK_MESSAGE)
         time.sleep(cfg.waf_backoff)
         return None
-    
+
     # Page 1: Motive selection
     human_sleep(MIN_HUMAN_SLEEP, MAX_HUMAN_SLEEP) # Simulate reading page
     page.select_option(MOTIVE_SELECTION, value=cfg.motive)
@@ -214,7 +216,7 @@ def check_nie_appointment(page, cfg: Config) -> bool | None:
 # Send a message via Telegram to the configured chat
 def notify_telegram(cfg: Config, message: str) -> None:
     if not cfg.telegram_bot_token or not cfg.telegram_chat_ids:
-        print("Telegram not configured, skipping notification")
+        logging.info("Telegram not configured, skipping notification")
         return
 
     url = f"https://api.telegram.org/bot{cfg.telegram_bot_token}/sendMessage"
@@ -226,12 +228,22 @@ def notify_telegram(cfg: Config, message: str) -> None:
         try:
             urllib.request.urlopen(url, data=data, timeout=15)
         except Exception as e:
-            print(f"Telegram failed for chat {chat_id}: {e}")
-
+            logging.error(f"Telegram failed for chat {chat_id}: {e}")
 
 def main() -> None:
+    # Set up logger
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler("bot.log"),
+        ],
+    )
+
     cfg = load_config()
-    pprint(f"{cfg}")
+    logging.info(f"{cfg}")
 
     install_browser(cfg.browser)
 
@@ -249,7 +261,7 @@ def main() -> None:
                 except KeyboardInterrupt:
                     raise
                 except Exception as e:
-                    print(f"Flow error: {e}")
+                    logging.error(f"Flow error: {e}")
                     found = False
 
                 # WAF backoff already slept, start next check right away
@@ -258,17 +270,18 @@ def main() -> None:
 
                 # If there is an appointment print a note and stop
                 if found:
-                    print("Appointment available, complete the process manually")
+                    logging.info("Appointment available, complete the process manually")
                     notify_telegram(cfg, TELEGRAM_MESSAGE)
                     input("Pause, press Enter to restart the loop or Ctrl+C to exit")
                     break
 
                 # Wait until next request
                 wait = random.randint(cfg.min_wait, cfg.max_wait)
-                print(f"No available appointments, next check in {wait / 60} min")
+                next_check = datetime.now() + timedelta(seconds=wait)
+                logging.info(f"No available appointments, next check at {next_check.strftime('%H:%M')}")
                 time.sleep(wait)
         except KeyboardInterrupt:
-            print("\nShutting down gracefully...")
+            logging.info("Shutting down gracefully...")
         finally:
             try:
                 browser.close()
